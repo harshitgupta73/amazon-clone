@@ -44,6 +44,8 @@ dependencies:
   cloudinary_public: ^0.23.1
   image_picker: ^1.1.2
   flutter_rating_bar: ^4.0.1
+  pay: ^3.2.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +71,8 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/applepay.json
+    - assets/gpay.json
 
   # To add assets to your application, add an assets section, like this:
 

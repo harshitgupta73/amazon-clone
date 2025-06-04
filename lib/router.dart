@@ -1,9 +1,12 @@
 import 'package:amazon_clone/common/widgets/bottom_bar.dart';
+import 'package:amazon_clone/features/address/screens/address_screen.dart';
 import 'package:amazon_clone/features/auth/screens/auth_screens.dart';
 import 'package:amazon_clone/features/home/screens/category_deal.dart';
 import 'package:amazon_clone/features/home/screens/home_screen.dart';
+import 'package:amazon_clone/features/order_details/screen/order_detail_screen.dart';
 import 'package:amazon_clone/features/product_details_screen/screen/product_details_screen.dart';
 import 'package:amazon_clone/features/search/screens/search_screen.dart';
+import 'package:amazon_clone/model/order.dart';
 import 'package:amazon_clone/model/product_model.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +28,18 @@ Route<dynamic> generateRoutes(RouteSettings settings) {
       return MaterialPageRoute(
         settings: settings,
         builder: (context) => const BottomBar(),
+      );
+    case AddressScreen.routeName:
+      var totalAmount = settings.arguments as String;
+      return MaterialPageRoute(
+        settings: settings,
+        builder: (context) =>  AddressScreen(totalAmount: totalAmount,),
+      );
+    case OrderDetailScreen.routeName:
+      var order = settings.arguments as Order;
+      return MaterialPageRoute(
+        settings: settings,
+        builder: (context) =>  OrderDetailScreen(order: order,),
       );
     case AddProductScreen.routeName:
       return MaterialPageRoute(
