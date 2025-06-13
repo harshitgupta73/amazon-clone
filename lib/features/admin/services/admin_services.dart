@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:amazon_clone/constants/GlobalVariables.dart';
 import 'package:amazon_clone/constants/utils.dart';
+import 'package:amazon_clone/features/admin/model/sales.dart';
+import 'package:amazon_clone/model/order.dart';
 import 'package:amazon_clone/model/product_model.dart';
 import 'package:amazon_clone/provider/user_provider.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
@@ -45,11 +47,11 @@ class AdminServices {
 
       http.Response res = await http.post(
         Uri.parse('$url/admin/add-product'),
-        headers:{
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': provider.user.token,
         },
-        body: product.toJson(),
+        body: jsonEncode(product.toMap()),
       );
 
       httpErrorHandling(
@@ -71,11 +73,12 @@ class AdminServices {
     try {
       http.Response res = await http.get(
         Uri.parse('$url/admin/get-products'),
-        headers:{
+        headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': provider.user.token,
         },
       );
+      // print(provider.user.token);
       httpErrorHandling(
         response: res,
         context: context,
@@ -102,7 +105,7 @@ class AdminServices {
     final provider = Provider.of<UserProvider>(context, listen: false);
     try {
       http.Response res = await http.delete(
-        Uri.parse('$url/admin/delete-product'),
+        Uri.parse('$url/admin/delete-products'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': provider.user.token,
@@ -113,5 +116,95 @@ class AdminServices {
     } catch (e) {
       showSnackbar(context, e.toString());
     }
+  }
+
+  void changeOrderStatus({
+    required BuildContext context,
+    required int status,
+    required Order order,
+    required VoidCallback onSuccess,
+  }) async {
+    final provider = Provider.of<UserProvider>(context, listen: false);
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$url/admin/change-order-status'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': provider.user.token,
+        },
+        body: jsonEncode({'id': order.id, 'status': status}),
+      );
+      // print('Order ID: ${order.id}');
+      // print('Status: $status');
+      httpErrorHandling(response: res, context: context, onSuccess: onSuccess);
+    } catch (e) {
+      showSnackbar(context, e.toString());
+    }
+  }
+
+  Future<List<Order>> fetchAllOrders(BuildContext context) async {
+    final provider = Provider.of<UserProvider>(context, listen: false);
+    List<Order> orderList = [];
+    try {
+      http.Response res = await http.get(
+        Uri.parse('$url/admin/get-all-orders'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': provider.user.token,
+        },
+      );
+      httpErrorHandling(
+        response: res,
+        context: context,
+        onSuccess: () {
+          for (int i = 0; i < jsonDecode(res.body).length; i++) {
+            orderList.add(Order.fromJson(jsonEncode(jsonDecode(res.body)[i])));
+          }
+
+        },
+      );
+    } catch (e) {
+      showSnackbar(context, e.toString());
+    }
+    return orderList;
+  }
+
+  Future<Map<String, dynamic>> getEarnings(BuildContext context) async {
+    final provider = Provider.of<UserProvider>(context, listen: false);
+    List<Sales> sales = [];
+    var earnings=0;
+    try {
+      http.Response res = await http.get(
+        Uri.parse('$url/admin/analytics'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': provider.user.token,
+        },
+      );
+      httpErrorHandling(
+        response: res,
+        context: context,
+        onSuccess: () {
+          var response = jsonDecode(res.body);
+          earnings = response['totalPrice'];
+          sales =[
+            Sales('Mobiles', response['mobileEarnings']) ,
+            Sales('Essentials', response['essentialEarnings']),
+            Sales('Appliances', response['appliancesEarnings']),
+            Sales('Books', response['booksEarnings']),
+            Sales('Fashion', response['fashionEarnings']),
+            Sales('Electronics', response['electronicsEarnings']),
+
+          ];
+
+        },
+      );
+    } catch (e) {
+      showSnackbar(context, e.toString());
+    }
+    return {
+      'sales':sales,
+      'totalEarnings':earnings
+    };
   }
 }

@@ -66,10 +66,20 @@ class _AddressScreenState extends State<AddressScreen> {
     );
   }
   void fun(){
-    if (Provider.of<UserProvider>(
+
+    final addressFromProvider = Provider.of<UserProvider>(
       context,
       listen: false,
-    ).user.address.isEmpty) {
+    ).user.address;
+
+    try {
+      payPressed(addressFromProvider); // Set addressToBeUsed first
+    } catch (e) {
+      showSnackbar(context, e.toString());
+      return;
+    }
+
+    if (addressFromProvider.isEmpty && addressToBeUsed.isNotEmpty) {
       addressServices.saveUserAddress(
         context: context,
         address: addressToBeUsed,
@@ -197,41 +207,41 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
               ),
 
-              ApplePayButton(
-                width: double.infinity,
-                onPressed: () {},
-                onPaymentResult: onApplePayResult,
-                style: ApplePayButtonStyle.whiteOutline,
-                type: ApplePayButtonType.buy,
-                paymentItems: paymentItems,
-                margin: const EdgeInsets.only(top: 15),
-                height: 50,
-                paymentConfiguration: _applePayConfig,
-              ),
-              const SizedBox(height: 10),
-
-              // FutureBuilder<PaymentConfiguration>(
-              //   future: _googlePayConfigFuture,
-              //   builder:
-              //       (context, snapshot) =>
-              //           snapshot.hasData
-              //               ?
-              GooglePayButton(
-                onPaymentResult: onGooglePayResult,
-                paymentItems: paymentItems,
-                width: double.infinity,
-                cornerRadius: 15,
-                height: 50,
-                type: GooglePayButtonType.buy,
-                margin: const EdgeInsets.only(top: 15),
-                loadingIndicator: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-                onPressed: () {},
-                paymentConfiguration: _googlePayConfigFuture,
-                // )
-                // : SizedBox(height: 10),
-              ),
+              // ApplePayButton(
+              //   width: double.infinity,
+              //   onPressed: () {},
+              //   onPaymentResult: onApplePayResult,
+              //   style: ApplePayButtonStyle.whiteOutline,
+              //   type: ApplePayButtonType.buy,
+              //   paymentItems: paymentItems,
+              //   margin: const EdgeInsets.only(top: 15),
+              //   height: 50,
+              //   paymentConfiguration: _applePayConfig,
+              // ),
+              // const SizedBox(height: 10),
+              //
+              // // FutureBuilder<PaymentConfiguration>(
+              // //   future: _googlePayConfigFuture,
+              // //   builder:
+              // //       (context, snapshot) =>
+              // //           snapshot.hasData
+              // //               ?
+              // GooglePayButton(
+              //   onPaymentResult: onGooglePayResult,
+              //   paymentItems: paymentItems,
+              //   width: double.infinity,
+              //   cornerRadius: 15,
+              //   height: 50,
+              //   type: GooglePayButtonType.buy,
+              //   margin: const EdgeInsets.only(top: 15),
+              //   loadingIndicator: const Center(
+              //     child: CircularProgressIndicator(),
+              //   ),
+              //   onPressed: () {},
+              //   paymentConfiguration: _googlePayConfigFuture,
+              //   // )
+              //   // : SizedBox(height: 10),
+              // ),
               
               ElevatedButton(onPressed: fun, child: Text("place Order"))
             ],

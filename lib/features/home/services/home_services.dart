@@ -61,6 +61,8 @@ class HomeServices {
         'x-auth-token': userProvider.user.token,
       });
 
+      // print(userProvider.user.token);
+
       httpErrorHandling(
         response: res,
         context: context,

@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       ),
       onGenerateRoute: (settings) => generateRoutes(settings),
       home:
-          Provider.of<UserProvider>(context).user.token.isNotEmpty
+        Provider.of<UserProvider>(context).user.token.isNotEmpty
               ? Provider.of<UserProvider>(context).user.type == 'admin'
                   ? const AdminScreen()
                   : const BottomBar()

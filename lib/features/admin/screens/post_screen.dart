@@ -2,6 +2,7 @@ import 'package:amazon_clone/common/widgets/loader.dart';
 import 'package:amazon_clone/features/account/widgets/single_dart.dart';
 import 'package:amazon_clone/features/admin/screens/add_product_screen.dart';
 import 'package:amazon_clone/features/admin/services/admin_services.dart';
+import 'package:amazon_clone/features/product_details_screen/screen/product_details_screen.dart';
 import 'package:amazon_clone/model/product_model.dart';
 import 'package:flutter/material.dart';
 
@@ -33,9 +34,7 @@ class _PostScreenState extends State<PostScreen> {
       product: product,
       onSuccess: () {
         products!.removeAt(index);
-        setState(() {
-
-        });
+        setState(() {});
       },
     );
   }
@@ -54,28 +53,36 @@ class _PostScreenState extends State<PostScreen> {
                   itemCount: products!.length,
                   itemBuilder: (context, index) {
                     final productData = products![index];
-                    return Column(
-                      children: [
-                        SizedBox(
-                          height: 140,
-                          child: SingleProduct(src: productData.images[0]),
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                productData.name,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
+                    return InkWell(
+                      onTap:() => Navigator.pushNamed(
+                        context,
+                        ProductDetailsScreen.routeName,
+                        arguments: productData,
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 130,
+                            child: SingleProduct(src: productData.images[0]),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  productData.name,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: deleteProducts(productData, index),
-                              icon: Icon(Icons.delete_outlined),
-                            ),
-                          ],
-                        ),
-                      ],
+                              IconButton(
+                                onPressed:
+                                    () => deleteProducts(productData, index),
+                                icon: Icon(Icons.delete_outlined),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),

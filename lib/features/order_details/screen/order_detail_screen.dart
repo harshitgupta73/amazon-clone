@@ -1,13 +1,17 @@
 import 'package:amazon_clone/common/widgets/custom_button.dart';
 import 'package:amazon_clone/constants/GlobalVariables.dart';
+import 'package:amazon_clone/features/admin/services/admin_services.dart';
 import 'package:amazon_clone/features/search/screens/search_screen.dart';
 import 'package:amazon_clone/model/order.dart';
+import 'package:amazon_clone/provider/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   static const String routeName = '/order-detail';
   final Order order;
+
   const OrderDetailScreen({super.key, required this.order});
 
   @override
@@ -15,20 +19,37 @@ class OrderDetailScreen extends StatefulWidget {
 }
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  int currentStep = 0;
 
-  int currentStep=0;
-  void navigateToSearchScreen(String query){
-    Navigator.pushNamed(context, SearchScreen.routeName,arguments: query);
+  void navigateToSearchScreen(String query) {
+    Navigator.pushNamed(context, SearchScreen.routeName, arguments: query);
   }
+
+  final AdminServices adminServices = AdminServices();
+
+  void changeOrderStatus(int status) {
+    adminServices.changeOrderStatus(
+      context: context,
+      status: status + 1,
+      order: widget.order,
+      onSuccess: () {
+        setState(() {
+          currentStep += status;
+        });
+      },
+    );
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentStep=widget.order.status;
+    currentStep = widget.order.status;
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<UserProvider>().user;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -67,15 +88,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.only(top: 10),
                         border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(7),
-                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(7)),
                           borderSide: BorderSide.none,
                         ),
                         enabledBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(7),
-                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(7)),
                           borderSide: BorderSide(
                             color: Colors.black38,
                             width: 1,
@@ -96,7 +113,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 height: 42,
                 margin: const EdgeInsets.symmetric(horizontal: 10),
                 child: Icon(Icons.mic, size: 25, color: Colors.black),
-              )
+              ),
             ],
           ),
         ),
@@ -109,26 +126,20 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             children: [
               const Text(
                 'View order details',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black12,
-                  ),
+                  border: Border.all(color: Colors.black12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Order Date:      ${DateFormat().format(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          widget.order.orderedAt),
-                    )}'),
+                    Text(
+                      'Order Date:      ${DateFormat().format(DateTime.fromMillisecondsSinceEpoch(widget.order.orderedAt))}',
+                    ),
                     Text('Order ID:          ${widget.order.id}'),
                     Text('Order Total:      \$${widget.order.totalPrice}'),
                   ],
@@ -137,16 +148,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               const SizedBox(height: 10),
               const Text(
                 'Purchase Details',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black12,
-                  ),
+                  border: Border.all(color: Colors.black12),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -173,9 +179,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(
-                                  'Qty: ${widget.order.quantity[i]}',
-                                ),
+                                Text('Qty: ${widget.order.quantity[i]}'),
                               ],
                             ),
                           ),
@@ -187,38 +191,32 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               const SizedBox(height: 10),
               const Text(
                 'Tracking',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black12,
-                  ),
+                  border: Border.all(color: Colors.black12),
                 ),
                 child: Stepper(
                   currentStep: currentStep,
                   controlsBuilder: (context, details) {
-                    // if (user.type == 'admin') {
-                    //   return CustomButton(
-                    //     text: 'Done',
-                    //     onTap: () => changeOrderStatus(details.currentStep),
-                    //   );
-                    // }
+                    if (user.type == 'admin') {
+                      return CustomButton(
+                        text: 'Done',
+                        onTap: () => changeOrderStatus(details.currentStep),
+                      );
+                    }
                     return const SizedBox();
                   },
                   steps: [
                     Step(
                       title: const Text('Pending'),
-                      content: const Text(
-                        'Your order is yet to be delivered',
-                      ),
+                      content: const Text('Your order is yet to be delivered'),
                       isActive: currentStep > 0,
-                      state: currentStep > 0
-                          ? StepState.complete
-                          : StepState.indexed,
+                      state:
+                          currentStep > 0
+                              ? StepState.complete
+                              : StepState.indexed,
                     ),
                     Step(
                       title: const Text('Completed'),
@@ -226,9 +224,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         'Your order has been delivered, you are yet to sign.',
                       ),
                       isActive: currentStep > 1,
-                      state: currentStep > 1
-                          ? StepState.complete
-                          : StepState.indexed,
+                      state:
+                          currentStep > 1
+                              ? StepState.complete
+                              : StepState.indexed,
                     ),
                     Step(
                       title: const Text('Received'),
@@ -236,9 +235,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         'Your order has been delivered and signed by you.',
                       ),
                       isActive: currentStep > 2,
-                      state: currentStep > 2
-                          ? StepState.complete
-                          : StepState.indexed,
+                      state:
+                          currentStep > 2
+                              ? StepState.complete
+                              : StepState.indexed,
                     ),
                     Step(
                       title: const Text('Delivered'),
@@ -246,9 +246,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         'Your order has been delivered and signed by you!',
                       ),
                       isActive: currentStep >= 3,
-                      state: currentStep >= 3
-                          ? StepState.complete
-                          : StepState.indexed,
+                      state:
+                          currentStep >= 3
+                              ? StepState.complete
+                              : StepState.indexed,
                     ),
                   ],
                 ),

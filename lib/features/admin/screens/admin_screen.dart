@@ -1,5 +1,8 @@
 import 'package:amazon_clone/constants/GlobalVariables.dart';
+import 'package:amazon_clone/features/account/services/account_services.dart';
+import 'package:amazon_clone/features/admin/screens/order_screen.dart';
 import 'package:amazon_clone/features/admin/screens/post_screen.dart';
+import 'package:amazon_clone/features/admin/screens/analytics_screen.dart';
 import 'package:flutter/material.dart';
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -15,8 +18,8 @@ class _AdminScreenState extends State<AdminScreen> {
 
   List<Widget> pages=[
     const PostScreen(),
-    const Center(child: Text("Analytics page"),),
-    const Center(child: Text("My Orders page"),),
+    const AnalyticsScreen(),
+    const OrderScreen(),
   ];
 
   void updatePage(int page){
@@ -39,19 +42,29 @@ class _AdminScreenState extends State<AdminScreen> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                alignment: Alignment.topLeft,
-                child: Image.asset(
-                  "assets/images/amazon_in.png",
-                  width: 120,
-                  height: 45,
-                  color: Colors.black,
+              Expanded(
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  // child: Image.asset(
+                  //   "assets/images/amazon.png",
+                  //   width: 120,
+                  //   height: 45,
+                  //   fit: BoxFit.contain,
+                  //   color: Colors.black,
+                  // ),
+                  child: Text("Amazon",style:TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  )),
                 ),
               ),
-              const Text("Admin",style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),)
+              InkWell(
+                onTap: ()=> AccountServices().logOut(context),
+                child: const Text("Log Out",style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),),
+              )
             ],
           ),
         ),

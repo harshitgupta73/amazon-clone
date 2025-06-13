@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-// const url = "http://192.168.119.228:8000";
-const url = "http://localhost:8000";
+
+// const url = "http://localhost:8000";
+// const url = "https://amazon-clone-backend-a3b7.onrender.com";
 class GlobalVariables{
   static const appBarGradient = LinearGradient(
     colors: [
@@ -29,27 +30,23 @@ class GlobalVariables{
 
     {
       'title': 'Appliances',
-      'image': 'assets/images/appliances.jpeg',
+      'image': 'assets/images/appliances.jpg',
     },
     {
       'title': 'Books',
-      'image': 'assets/images/books.jpeg',
-    },
-    {
-      'title': 'Electronics',
-      'image': 'assets/images/electronics.jpeg',
+      'image': 'assets/images/books.jpg',
     },
     {
       'title': 'Essentials',
-      'image': 'assets/images/essentials.jpeg',
+      'image': 'assets/images/essentials.jpg',
     },
     {
       'title': 'Fashion',
-      'image': 'assets/images/fashion.jpeg',
+      'image': 'assets/images/fashion.jpg',
     },
     {
       'title': 'Mobiles',
-      'image': 'assets/images/mobiles.jpeg',
+      'image': 'assets/images/mobile.jpg',
     },
   ];
 }
